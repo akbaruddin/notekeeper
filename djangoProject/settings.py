@@ -25,7 +25,9 @@ SECRET_KEY = 'd1y+a!1-=^gn16%#855y=kwgnsy7##%h_jr&-+1i+fkz79+7)8'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'notebook-pychamp.herokuapp.com'
+]
 
 
 # Application definition
