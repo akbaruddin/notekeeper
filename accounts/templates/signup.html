@@ -1,0 +1,117 @@
+{% extends 'registration_base.html' %}
+{% load tags %}
+{% block title %}Sign Up to Notebook{% endblock %}
+{% block content %}
+<div class="uk-position-top-right uk-padding-small uk-visible@m">
+    Already a member? <a href="/accounts/login/">Sign In</a>
+</div>
+<div class="uk-container-expand h-100">
+    <div class="uk-grid-collapse uk-child-width-expand@s h-100" uk-grid>
+        <div class="uk-width-1-3@m left-section uk-heading-small uk-padding-large">
+            Discover the new world of Notebook.
+        </div>
+        <div class="uk-width-expand@m">
+            <div class="uk-grid-row-medium uk-padding-large">
+                <div class="uk-flex-center" uk-grid>
+                    <div class="uk-width-1-2@s">
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                                <div class="uk-alert-danger" uk-alert>
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <h1 class="uk-text-large uk-margin-medium-top">Sign Up to Notebook <button class="uk-icon-button uk-background-default uk-margin-small-right" uk-icon="info" uk-toggle="target: #offcanvas-flip"></button></h1>
+
+                        <form method="post" class="form uk-grid-small" action="{% url 'signup' %}" uk-grid>
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ next }}" />
+                            <div class="uk-width-1-2@s">
+                                <label for="id_username"><span uk-icon="user"></span> {{ form.username.label }}</label>
+                                {% if form.username.errors %}
+                                    {{ form.username | add_css:"uk-input uk-form-danger uk-margin-small-top" }}
+                                    <p class="uk-text-danger uk-text-small uk-margin-remove-top">{{ form.username.errors | join:'<br />' }}</p>
+                                {% else %}
+                                    {{ form.username | add_css:"uk-input uk-margin-small-top" }}
+                                {% endif %}
+                            </div>
+                            <div class="uk-width-1-2@s">
+                                <label for="id_name"><span uk-icon="user"></span> {{ form.name.label }}</label>
+                                {% if form.name.errors %}
+                                    {{ form.name | add_css:"uk-input uk-form-danger uk-margin-small-top" }}
+                                    <p class="uk-text-danger uk-text-small uk-margin-remove-top">{{ form.name.errors | join:'<br />' }}</p>
+                                {% else %}
+                                    {{ form.name | add_css:"uk-input uk-margin-small-top" }}
+                                {% endif %}
+                            </div>
+                            <div class="uk-width-1-1">
+                                <label for="id_email"><span uk-icon="mail"></span> {{ form.email.label }}</label>
+                                {% if form.email.errors %}
+                                    {{ form.email | add_css:"uk-input uk-form-danger uk-margin-small-top" }}
+                                    <p class="uk-text-danger uk-text-small uk-margin-remove-top">{{ form.email.errors | join:'<br />' }}</p>
+                                {% else %}
+                                    {{ form.email | add_css:"uk-input uk-margin-small-top" }}
+                                {% endif %}
+                            </div>
+                            <div class="uk-width-1-1">
+                                <label for="id_password1"><span uk-icon="unlock"></span> {{ form.password1.label }}</label>
+                                {% if form.password1.errors %}
+                                    {{ form.password1 | add_css:"uk-input uk-form-danger uk-margin-small-top" }}
+                                    <p class="uk-text-danger uk-text-small uk-margin-remove-top">{{ form.password1.errors | join:'<br />' }}</p>
+                                {% else %}
+                                    {{ form.password1 | add_css:"uk-input uk-margin-small-top" }}
+                                {% endif %}
+                            </div>
+                            <div class="uk-width-1-1">
+                                <label for="id_password2"><span uk-icon="unlock"></span> {{ form.password2.label }}</label>
+                                {% if form.password2.errors %}
+                                    {{ form.password2 | add_css:"uk-input uk-form-danger uk-margin-small-top" }}
+                                    <p class="uk-text-danger uk-text-small uk-margin-remove-top">{{ form.password2.errors | join:'<br />' }}</p>
+                                {% else %}
+                                    {{ form.password2 | add_css:"uk-input uk-margin-small-top" }}
+                                {% endif %}
+                            </div>
+                            <div class="uk-width-1-1">
+                                <button class="uk-button uk-button-primary uk-margin-small-top" type="submit">Create Account</button>
+                            </div>
+                            <div class="uk-width-1-1">
+                                <div class="uk-hidden@m">
+                                    Already a member? <a href="/accounts/login/">Sign In</a>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="offcanvas-flip" uk-offcanvas="flip: true; overlay: true">
+        <div class="uk-offcanvas-bar">
+            <button class="uk-offcanvas-close" type="button" uk-close></button>
+            <h3>Information for Sign Up</h3>
+
+            {% if form.username.help_text %}
+                <h5>{{ form.username.label }}</h5>
+                <p>{{ form.username.help_text }}</p>
+            {% endif %}
+
+            {% if form.name.help_text %}
+                <h5>{{ form.name.label }}</h5>
+                <p>{{ form.name.help_text }}</p>
+            {% endif %}
+
+            {% if form.password1.help_text %}
+                <h5>{{ form.password1.label }}</h5>
+                <p>{{ form.password1.help_text }}</p>
+            {% endif %}
+
+            {% if form.password2.help_text %}
+                <h5>{{ form.password2.label }}</h5>
+                <p>{{ form.password2.help_text }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.urls import path, include
+from accounts import views
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/signup/', views.signup, name='signup'),
     path('accounts/login/', LoginView.as_view(redirect_authenticated_user=True), name='login'),
     # path('tags/<slug:slug>/', views.get_all_notes_tags, name='get_all_notes_tags'),
     path('', include('notes.urls')),
