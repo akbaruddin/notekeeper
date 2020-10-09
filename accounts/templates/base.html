@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+{% load static %}
+{% load active %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <div class="container-fluid h-100">
+      <div class="row">
+        <div id="sidebar" class="col-lg-3 col-md-3 d-none d-lg-block d-md-block position-fixed h-100">
+          Sidebar
+        </div>
+        <div class="col-lg-9 col-md-9 offset-md-3 col-sm-12 col-xs-12" style="padding-top: 1%; padding-left: 0; padding-right: 0;">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </div>
+    </div>
+</body>
+</html>

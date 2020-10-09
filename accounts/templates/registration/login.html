@@ -1,0 +1,49 @@
+{% extends 'registration_base.html' %}
+{% load tags %}
+{% block title %}Sign in to Notebook{% endblock %}
+{% block content %}
+<div class="uk-position-top-right uk-padding-small uk-visible@m">
+    Not a member? <a href="/signup/">Sign up now</a>
+</div>
+<div class="uk-container-expand h-100">
+    <div class="uk-grid-collapse uk-child-width-expand@s h-100" uk-grid>
+        <div class="uk-width-1-3@m left-section uk-heading-small uk-padding-large">
+            Discover the new world of Notebook.
+        </div>
+        <div class="uk-width-expand@m">
+            <div class="uk-grid-row-medium uk-padding-large">
+                <div class="uk-flex-center" uk-grid>
+                    <div class="uk-width-1-2@s">
+                        {% if form.non_field_errors %}
+                            {% for error in form.non_field_errors %}
+                                <div class="uk-alert-danger" uk-alert>
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <h1 class="uk-text-large uk-margin-medium-top">Sign in to Notebook</h1>
+                        <form method="post" class="form" action="{% url 'login' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ next }}" />
+                            <div class="uk-margin">
+                                <label for="username"><span uk-icon="user"></span> {{ form.username.label }}</label>
+                                {{ form.username | add_css:"uk-input uk-margin-small-top" }}
+                            </div>
+                            <div class="uk-margin">
+                                <label for="password"><span uk-icon="unlock"></span> {{ form.password.label }}</label>
+                                {{ form.password | add_css:"uk-input uk-margin-small-top" }}
+                            </div>
+                            <button class="uk-button uk-button-primary" type="submit"><span uk-icon="sign-in"></span> Sign In</button>
+                            <div class="uk-margin uk-hidden@m">
+                                Not a member? <a href="/signup/">Sign up now</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

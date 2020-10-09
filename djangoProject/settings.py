@@ -26,6 +26,7 @@ SECRET_KEY = 'd1y+a!1-=^gn16%#855y=kwgnsy7##%h_jr&-+1i+fkz79+7)8'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '*',
     'notebook-pychamp.herokuapp.com'
 ]
 
@@ -40,6 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'notekeeper.apps.NotekeeperConfig',
+    'crispy_forms',
+    'notes',
+    'accounts',
+    'taggit',
 ]
 
 MIDDLEWARE = [
@@ -118,10 +123,12 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
