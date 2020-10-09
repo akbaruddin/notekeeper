@@ -1,0 +1,18 @@
+html,
+body,
+.h-100 {
+  height: 100%;
+}
+
+.left-section {
+  background: #f1cdd7;
+  color: #865c6c;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 959px) {
+  .left-section {
+    display: none;
+  }
+}
