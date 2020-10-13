@@ -105,7 +105,9 @@
 {% endblock %}
 {% block script %}
     <script>
-        var dataTable = new DataTable("#all_notes");
+        if(document.querySelector("#all_notes")) {
+            var dataTable = new DataTable("#all_notes");
+        }
         var tag = document.querySelector('#id_tags');
     tag.removeAttribute("required");
     tagsInput(tag);
