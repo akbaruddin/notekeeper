@@ -1,0 +1,28 @@
+{% load static %}
+<nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+        <ul class="uk-navbar-nav">
+            <li class="uk-active"><a href="{% url 'home' %}"><span class="uk-margin-small-right" uk-icon="file-text"></span> Notes</a></li>
+        </ul>
+    </div>
+    <div class="uk-navbar-right">
+        {% if request.user.is_authenticated %}
+        <ul class="uk-navbar-nav">
+            <li class="uk-active"><a href="#modal-full" uk-toggle><span class="uk-margin-small-right" uk-icon="plus"></span> Add Note</a></li>
+            <li class="uk-active"><a href="{% url 'notes' %}"><span class="uk-margin-small-right" uk-icon="table"></span> Show All Notes</a></li>
+            <li>
+                <a href="#">Welcome, {{ request.user.username }} <span class="uk-icon-button uk-margin-small-right" uk-icon="user"></span></a>
+                <div class="uk-navbar-dropdown">
+                    <ul class="uk-nav uk-navbar-dropdown-nav">
+                        <li class="uk-active"><a href="{% url 'change_password' %}"><span class="uk-margin-small-right" uk-icon="pencil"></span> Change Password</a></li>
+                        <li class="uk-active"><a href="{% url 'logout' %}"><span class="uk-margin-small-right" uk-icon="sign-out"></span> Logout</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+        {% else %}
+            <ul class="uk-navbar-nav">
+            </ul>
+        {% endif %}
+    </div>
+</nav>

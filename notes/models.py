@@ -1,11 +1,37 @@
 from django.db import models
 from django import forms
-
+from django.utils.text import slugify
+from django.utils.html import mark_safe
 from django.core.signing import Signer
 from django.contrib.auth.models import User
 from django_cryptography.fields import encrypt
 from taggit.managers import TaggableManager
-# Create your models here.
+import markdown
+import markdown.extensions.fenced_code
+import markdown.extensions.codehilite
+import markdown.extensions.tables
+import markdown.extensions.toc
+import uuid
+from django.urls import reverse
+from unidecode import unidecode
+# Create your modals here.
+
+
+def generate_unique_slug(_class, field):
+    """
+    return unique slug if origin slug is exist
+    :param _class:
+    :param field: is specific field for title
+    :return:
+    """
+    origin_slug = slugify(field)
+    unique_slug = origin_slug
+    numb = 1
+    while _class.objects.filter(slug=unique_slug).exists():
+        unique_slug = '%s-%d' % (origin_slug, numb)
+        numb += 1
+
+    return unique_slug
 
 
 class Note(models.Model):
@@ -18,6 +44,39 @@ class Note(models.Model):
     tags = TaggableManager()
     signer = Signer(salt='notes.Note')
 
+    def get_message_as_markdown(self):
+        return mark_safe(
+            markdown.markdown(
+                self.note_content,
+                extensions=['codehilite', 'fenced_code', 'markdown_checklist.extension', 'tables', 'toc'],
+                # extension_configs={
+                #     'codehilite':{
+                #         'linenums': True
+                #     }
+                # }
+                output_format="html5"
+            )
+        )
+
+    def get_signed_hash(self):
+        signed_pk = self.signer.sign(self.pk)
+        return signed_pk
+
+    def get_absolute_url(self):
+        return reverse('share_notes', args=(self.get_signed_hash(),))
+
+    def __str__(self):
+        return self.note_title
+
+    def save(self, *args, **kwargs):
+        title = unidecode(self.note_title)
+        if self.slug:
+            if slugify(title) != self.slug:
+                self.slug = generate_unique_slug(Note, title)
+        else:
+            self.slug = generate_unique_slug(Note, title)
+        super(Note, self).save(*args, **kwargs)
+
 
 class AddNoteForm(forms.ModelForm):
     class Meta:
@@ -28,6 +87,7 @@ class AddNoteForm(forms.ModelForm):
             'tags': forms.TextInput(
                 attrs={
                     'data-role': 'tagsinput',
+                    'value': 'notes'
                 }
             )
         }

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Notes with tag: {{ tag }}{% endblock %}
+{% load humanize %}
+{% block content %}
+    {% include 'navbar.html' %}
+    <div class="" uk-grid>
+        <div class="uk-width-expand">
+            <div class="uk-padding-small">
+                 <table class="uk-table uk-table-striped uk-table-divider" id="all_notes">
+                    <thead class="thead-dark">
+                        <tr class="text-center">
+                            <th scope="col" class="uk-table-expand">Title</th>
+                            <th scope="col" class="uk-width-small">Last Updated</th>
+                            <th scope="col" class="uk-width-small"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in all_notes %}
+                        <tr>
+                            <td><a href="{% url 'note_detail' note.slug %}">{{ note.note_title|truncatechars:30 }}</a></td>
+                            <td>{{ note.updated_at|naturaltime }}</td>
+                            <td class="">
+                                <a data-url="{% url 'note_details_edit' note.id %}" class="uk-icon-link uk-text-success uk-margin-small-right" onclick="editForm(this);" uk-icon="file-edit"></a>
+                                <a href="{% url 'note_as_pdf' note.slug %}" class="uk-icon-link uk-text-primary uk-margin-small-right" uk-icon="download"></a>
+                                <a data-url="{% url 'confirm_delete_note' note.id %}" class="uk-icon-link uk-text-danger" uk-icon="trash" onclick="deleteForm(this);"></a>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+    var dataTable = new DataTable("#all_notes");
+
+    function editForm(e) {
+        var url = e.getAttribute("data-url");
+        axios
+            .get(url, {responseType: 'document'})
+            .then(function(data){
+                var editor = document.querySelector("#modal-edit");
+                if (editor) {
+                    editor.remove();
+                }
+                document.body.appendChild(data.data.querySelector("#modal-edit"));
+
+                editor = document.querySelector("#modal-edit");
+                editor.addEventListener("beforeshow", function() {
+                    new EasyMDE({
+                        autofocus: true,
+                        autorefresh: true,
+                        spellChecker: false,
+                        minHeight: '180px',
+                        element: document.getElementById('id_note_content-edit'),
+                    });
+                    var tag = document.querySelector('#id_tags-edit');
+                    tag.removeAttribute("required");
+                    tagsInput(tag);
+                })
+                UIkit.modal(document.querySelector("#modal-edit")).show();
+            })
+    };
+
+    function deleteForm(e) {
+        var url = e.getAttribute("data-url");
+        axios
+            .get(url, {responseType: 'document'})
+            .then(function(data){
+                var editor = document.querySelector("#modal-delete");
+                if (editor) {
+                    editor.remove();
+                }
+                document.body.appendChild(data.data.querySelector("#modal-delete"));
+                UIkit.modal(document.querySelector("#modal-delete")).show();
+            })
+    };
+    </script>
+
+{% endblock %}

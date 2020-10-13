@@ -1,0 +1,45 @@
+{% load active %}
+<div id="modal-edit" class="uk-modal-full" uk-modal>
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
+        <div class="uk-grid-collapse uk-child-width-1-1 uk-flex-middle" uk-grid>
+            <form class="form" action="{% url 'note_details_edit' form.instance.id %}" method="post">
+                {% csrf_token %}
+                <div class="" uk-height-viewport>
+                    <div class="uk-modal-header">
+                        <h2 class="uk-modal-title">Edit "{{ form.instance.note_title }}"</h2>
+                    </div>
+                    <div class="uk-modal-body uk-padding" uk-grid>
+                        {{ form.media }}
+
+                        <div class="uk-width-1-1">
+                            <label class="uk-form-label" for="id_note_title-edit">{{ form.note_title.label }}</label>
+                            <div class="uk-form-controls">
+                                {{ form.note_title | add_id_css:"edit,uk-input uk-margin-small-top" }}
+                            </div>
+                        </div>
+
+                        <div class="uk-width-1-1">
+                            <label class="uk-form-label" for="id_note_content-edit">{{ form.note_content.label }}</label>
+                            <div class="uk-form-controls uk-margin-small-top">
+                                {{ form.note_content | add_id:"edit" }}
+                            </div>
+                        </div>
+
+                        <div class="uk-width-1-1">
+                            <label class="uk-form-label" for="id_tags-edit">{{ form.tags.label }}</label>
+                            <div class="uk-form-controls">
+                                {{ form.tags | add_id_css:"edit,uk-input uk-margin-small-top" }}
+                            </div>
+                            <p class="uk-text-muted uk-text-small uk-margin-remove-top">{{ form.tags.help_text }}</p>
+                        </div>
+                    </div>
+                    <div class="uk-modal-footer uk-text-right">
+                        <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                        <button class="uk-button uk-button-primary" type="submit">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

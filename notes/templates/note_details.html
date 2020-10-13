@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}Notes{% endblock %}
+{% load active %}
+{% load humanize %}
+{% block content %}
+    {% include 'navbar.html' %}
+    <div class="" uk-grid>
+        <div class="uk-width-1-4 uk-visible@m uk-background-muted uk-height-viewport" uk-height-viewport="offset-top: true">
+            <div class="uk-padding-small">
+                <form >
+                    <div class="uk-margin">
+                        <div class="uk-inline uk-width-1-1">
+                            <a class="uk-form-icon" href="#" uk-icon="icon: search"></a>
+                            <input class="uk-input" id="autoComplete" type="text" placeholder="Search">
+                        </div>
+                    </div>
+                </form>
+                <ul class="uk-nav">
+                    {% for note in notes %}
+                        <li><a href="{% url 'note_detail' note.slug %}" class="{% add_active request 'note_detail' note.slug %} nav-link">{{ note.note_title|truncatechars:24 }}</a></li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <div class="uk-width-expand">
+            <div class="uk-padding-small">
+                {% if note_detail %}
+                    <div class="" uk-grid>
+                        <div class="uk-width-expand">
+                            <h3 style="word-wrap: break-word;">
+                                {{ note_detail.note_title }}
+                            </h3>
+                        </div>
+                        <div class="uk-width-auto">
+                            <a data-url="{% url 'note_details_edit' note_detail.id %}" class="uk-icon-link uk-text-success uk-margin-small-right" id="editForm" uk-icon="file-edit"></a>
+                            <a href="{% url 'note_as_pdf' note_detail.slug %}" class="uk-icon-link uk-text-primary uk-margin-small-right" uk-icon="download"></a>
+                            <a data-url="{% url 'confirm_delete_note' note_detail.id %}" class="uk-icon-link uk-text-danger" uk-icon="trash" href="#modal-delete" uk-toggle></a>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top" uk-grid>
+                        <div class="uk-width-auto">
+                            <p class="uk-text-small uk-text-muted">Last Updated: {{ note_detail.updated_at|naturaltime }}</p>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top" uk-grid>
+                        <div class="uk-width-1-1" uk-grid>
+                            <div class="uk-width-1-1">
+                                <div class="uk-inline uk-width-1-1 uk-form-controls">
+                                    <a class="uk-form-icon uk-form-icon-flip" id="btnCopy" uk-icon="icon: copy"></a>
+                                    <input class="uk-input" id="inputCopy" type="text" value="{{ absolute_url }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top" uk-grid>
+                        <div class="uk-width-1-1" uk-grid>
+                            <div class="">
+                                {% for tag in note_detail.tags.all %}
+                                    <a href="{% url 'get_all_notes_tags' tag.slug %}"><span class="uk-badge uk-border-rounded">{{ tag.name }}</span></a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="uk-margin-small-top" uk-grid>
+                        <div class="uk-width-1-1" uk-grid>
+                            <div class="">
+                                {{ note_detail.get_message_as_markdown }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+<div id="modal-delete" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+        <h2 class="uk-modal-title">Confirm Deletion</h2>
+        <p>Are you sure you want to delete "{{ note_detail.note_title }}"?</p>
+        <p class="uk-text-right">
+            <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+            <a href="{% url 'delete_single_note' note_detail.id %}" class="uk-button uk-button-primary">Delete</a>
+        </p>
+    </div>
+</div>
+    <div id="modal-full" class="uk-modal-full" uk-modal>
+        <div class="uk-modal-dialog">
+            <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
+            <div class="uk-grid-collapse uk-child-width-1-1 uk-flex-middle" uk-grid>
+                <form action="{% url 'notes' %}" method="post">
+                    {% csrf_token %}
+                    <div class="" uk-height-viewport>
+                        <div class="uk-modal-header">
+                            <h2 class="uk-modal-title">Add New Note</h2>
+                        </div>
+                        <div class="uk-modal-body">
+                            <div class="uk-width-1-1">
+                                <label class="uk-form-label" for="id_note_title">{{ add_note_form.note_title.label }}</label>
+                                <div class="uk-form-controls">
+                                    {{ add_note_form.note_title | add_css:"uk-input uk-margin-small-top" }}
+                                </div>
+                            </div>
+
+                            <div class="uk-width-1-1 uk-margin-small-top">
+                                <label class="uk-form-label" for="id_note_content">{{ add_note_form.note_content.label }}</label>
+                                <div class="uk-form-controls uk-margin-small-top">
+                                    {{ add_note_form.note_content }}
+                                </div>
+                            </div>
+
+                            <div class="uk-width-1-1 uk-margin-small-top">
+                                <label class="uk-form-label" for="id_tags-edit">{{ add_note_form.tags.label }}</label>
+                                <div class="uk-form-controls">
+                                    {{ add_note_form.tags | add_css:"uk-input uk-margin-small-top" }}
+                                </div>
+                                <p class="uk-text-muted uk-text-small uk-margin-remove-top">{{ add_note_form.tags.help_text }}</p>
+                            </div>
+                        </div>
+                        <div class="uk-modal-footer uk-text-right">
+                            <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                            <button class="uk-button uk-button-primary" type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+    var tag = document.querySelector('#id_tags');
+    tag.removeAttribute("required");
+    tagsInput(tag);
+    new EasyMDE({
+        autofocus: true,
+        autorefresh: true,
+        spellChecker: false,
+        minHeight: '180px',
+        element: document.getElementById('id_note_content'),
+    });
+    var editForm = document.querySelector("#editForm");
+    editForm.addEventListener("click", function (e) {
+        var url = this.getAttribute("data-url");
+        axios
+            .get(url, {responseType: 'document'})
+            .then(function(data){
+                var editor = document.querySelector("#modal-edit");
+                if (editor) {
+                    editor.remove();
+                }
+                document.body.appendChild(data.data.querySelector("#modal-edit"));
+
+                editor = document.querySelector("#modal-edit");
+                editor.addEventListener("beforeshow", function() {
+                    new EasyMDE({
+                        autofocus: true,
+                        autorefresh: true,
+                        spellChecker: false,
+                        minHeight: '180px',
+                        element: document.getElementById('id_note_content-edit'),
+                    });
+                     tagsInput(document.querySelector('#id_tags-edit'));
+                })
+                UIkit.modal(document.querySelector("#modal-edit")).show();
+            })
+    });
+
+    document.querySelector("#btnCopy").addEventListener("click", function (){
+      var copyText = document.getElementById("inputCopy");
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+    });
+    new autoComplete({
+        selector: '#autoComplete',
+        minChars: 1,
+        source: function(term, suggest){
+            console.log(term)
+            term = term.toLowerCase();
+            axios
+                .get('/notes/search/?term=' + term)
+                .then(resp => {
+                    var choices = resp.data;
+                    var suggestions = [];
+                    for (var i=0;i<choices.length;i++)
+                        if (~choices[i].label.toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+
+                    suggest(suggestions);
+                });
+        },
+        renderItem: function (item, search){
+          var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+          return '<div class="autocomplete-suggestion" data-href="/notes/' + item.slug + '" data-val="' + item.label + '">' + item.label.replace(re, "<b>$1</b>") + '</div>';
+        },
+        onSelect: function(e, term, item){
+            window.location.href = e.currentTarget.querySelector(".selected").dataset.href;
+        }
+    });
+    </script>
+{% endblock %}

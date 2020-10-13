@@ -17,12 +17,16 @@ from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.urls import path, include
 from accounts import views
+from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/signup/', views.signup, name='signup'),
     path('accounts/login/', LoginView.as_view(redirect_authenticated_user=True), name='login'),
-    # path('tags/<slug:slug>/', views.get_all_notes_tags, name='get_all_notes_tags'),
+    path('accounts/logout/', views.logout_view, name='logout'),
+    path('accounts/change_password/', views.change_password, name='change_password'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    # path('summernote/', include('django_summernote.urls')),
     path('', include('notes.urls')),
 ]

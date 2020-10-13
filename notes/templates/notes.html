@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block title %}Notes{% endblock %}
+{% load active %}
+{% load humanize %}
+{% block content %}
+    {% include 'navbar.html' %}
+    <div class="" uk-grid>
+        <div class="uk-width-1-4 uk-visible@m uk-background-muted uk-height-viewport" uk-height-viewport="offset-top: true">
+            <div class="uk-padding-small">
+                <form >
+                    <div class="uk-margin">
+                        <div class="uk-inline uk-width-1-1">
+                            <a class="uk-form-icon" href="#" uk-icon="icon: search"></a>
+                            <input class="uk-input" id="autoComplete" type="text" placeholder="Search">
+                        </div>
+                    </div>
+                </form>
+                <ul class="uk-nav">
+                    {% for note in notes %}
+                        <li><a href="{% url 'note_detail' note.slug %}" class="{% add_active request 'note_detail' note.slug %} nav-link">{{ note.note_title|truncatechars:24 }}</a></li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+        <div class="uk-width-expand">
+            <div class="uk-padding-small">
+                {% if all_notes|length == 0 %}
+                    <p>
+                        Hi, welcome to Django Notebook where you can store all your notes!
+                    </p>
+                    <p>
+                        You can add a new note to get started from left side menu by clicking on the sign.
+                    </p>
+                {% else %}
+                    <table class="uk-table uk-table-striped uk-table-divider" id="all_notes">
+                    <thead class="thead-dark">
+                        <tr class="text-center">
+                            <th scope="col" class="uk-table-expand">Title</th>
+                            <th scope="col" class="uk-width-small">Last Updated</th>
+                            <th scope="col" class="uk-width-small"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in all_notes %}
+                        <tr>
+                            <td><a href="{% url 'note_detail' note.slug %}">{{ note.note_title|truncatechars:30 }}</a></td>
+                            <td>{{ note.updated_at|naturaltime }}</td>
+                            <td class="">
+                                <a data-url="{% url 'note_details_edit' note.id %}" class="uk-icon-link uk-text-success uk-margin-small-right" onclick="editForm(this);" uk-icon="file-edit"></a>
+                                <a href="{% url 'note_as_pdf' note.slug %}" class="uk-icon-link uk-text-primary uk-margin-small-right" uk-icon="download"></a>
+                                <a data-url="{% url 'confirm_delete_note' note.id %}" class="uk-icon-link uk-text-danger" uk-icon="trash" onclick="deleteForm(this);"></a>
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div id="modal-full" class="uk-modal-full" uk-modal>
+        <div class="uk-modal-dialog">
+            <button class="uk-modal-close-full uk-close-large" type="button" uk-close></button>
+            <div class="uk-grid-collapse uk-child-width-1-1 uk-flex-middle" uk-grid>
+                <form action="{% url 'notes' %}" method="post">
+                    {% csrf_token %}
+                    <div class="" uk-height-viewport>
+                        <div class="uk-modal-header">
+                            <h2 class="uk-modal-title">Add New Note</h2>
+                        </div>
+                        <div class="uk-modal-body">
+                            <div class="uk-width-1-1">
+                                <label class="uk-form-label" for="id_note_title">{{ add_note_form.note_title.label }}</label>
+                                <div class="uk-form-controls">
+                                    {{ add_note_form.note_title | add_css:"uk-input uk-margin-small-top" }}
+                                </div>
+                            </div>
+
+                            <div class="uk-width-1-1 uk-margin-small-top">
+                                <label class="uk-form-label" for="id_note_content">{{ add_note_form.note_content.label }}</label>
+                                <div class="uk-form-controls uk-margin-small-top">
+                                    {{ add_note_form.note_content }}
+                                </div>
+                            </div>
+
+                            <div class="uk-width-1-1 uk-margin-small-top">
+                                <label class="uk-form-label" for="id_tags-edit">{{ add_note_form.tags.label }}</label>
+                                <div class="uk-form-controls">
+                                    {{ add_note_form.tags | add_css:"uk-input uk-margin-small-top" }}
+                                </div>
+                                <p class="uk-text-muted uk-text-small uk-margin-remove-top">{{ add_note_form.tags.help_text }}</p>
+                            </div>
+                        </div>
+                        <div class="uk-modal-footer uk-text-right">
+                            <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                            <button class="uk-button uk-button-primary" type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        var dataTable = new DataTable("#all_notes");
+        var tag = document.querySelector('#id_tags');
+    tag.removeAttribute("required");
+    tagsInput(tag);
+    new EasyMDE({
+        autofocus: true,
+        autorefresh: true,
+        spellChecker: false,
+        minHeight: '180px',
+        element: document.getElementById('id_note_content'),
+    });
+
+    function editForm(e) {
+        var url = e.getAttribute("data-url");
+        axios
+            .get(url, {responseType: 'document'})
+            .then(function(data){
+                var editor = document.querySelector("#modal-edit");
+                if (editor) {
+                    editor.remove();
+                }
+                document.body.appendChild(data.data.querySelector("#modal-edit"));
+
+                editor = document.querySelector("#modal-edit");
+                editor.addEventListener("beforeshow", function() {
+                    new EasyMDE({
+                        autofocus: true,
+                        autorefresh: true,
+                        spellChecker: false,
+                        minHeight: '180px',
+                        element: document.getElementById('id_note_content-edit'),
+                    });
+                    var tag = document.querySelector('#id_tags-edit');
+                    tag.removeAttribute("required");
+                    tagsInput(tag);
+                })
+                UIkit.modal(document.querySelector("#modal-edit")).show();
+            })
+    };
+
+    function deleteForm(e) {
+        var url = e.getAttribute("data-url");
+        axios
+            .get(url, {responseType: 'document'})
+            .then(function(data){
+                var editor = document.querySelector("#modal-delete");
+                if (editor) {
+                    editor.remove();
+                }
+                document.body.appendChild(data.data.querySelector("#modal-delete"));
+                UIkit.modal(document.querySelector("#modal-delete")).show();
+            })
+    };
+    new autoComplete({
+        selector: '#autoComplete',
+        minChars: 1,
+        source: function(term, suggest){
+            console.log(term)
+            term = term.toLowerCase();
+            axios
+                .get('/notes/search/?term=' + term)
+                .then(resp => {
+                    var choices = resp.data;
+                    var suggestions = [];
+                    for (var i=0;i<choices.length;i++)
+                        if (~choices[i].label.toLowerCase().indexOf(term)) suggestions.push(choices[i]);
+
+                    suggest(suggestions);
+                });
+        },
+        renderItem: function (item, search){
+          var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+          return '<div class="autocomplete-suggestion" data-href="/notes/' + item.slug + '" data-val="' + item.label + '">' + item.label.replace(re, "<b>$1</b>") + '</div>';
+        },
+        onSelect: function(e, term, item){
+            window.location.href = e.currentTarget.querySelector(".selected").dataset.href;
+        }
+    });
+    </script>
+
+{% endblock %}

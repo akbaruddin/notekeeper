@@ -1,0 +1,19 @@
+{% block content %}
+    <div class="" uk-grid>
+        {% if note_detail %}
+            <div class="" uk-grid>
+                <div class="uk-width-expand">
+                    Last Updated: {{ note_detail.updated_at }}
+                </div>
+                <div class="uk-width-expand">
+                    <h3 style="word-wrap: break-word;font-size: 20px">
+                        Title: {{ note_detail.note_title }}
+                    </h3>
+                </div>
+                <div class="uk-width-expand" style="font-size: 16px">
+                    {{ note_detail.get_message_as_markdown }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
